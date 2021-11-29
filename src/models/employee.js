@@ -3,11 +3,16 @@ const app = express();
 
 const mongoose = require('mongoose');
 
+
+
+
 const connect = async () => {
-    mongoose.connect("mongodb://localhost:27017/employee-api")
+    mongoose.connect("mongodb://127.0.0.1:27017/naukri")
 }
 
 app.use(express.json());
+
+
 
 const jobschema = new mongoose.Schema({
 
@@ -32,13 +37,78 @@ const jobschema = new mongoose.Schema({
 const jobs = mongoose.model("job", jobschema);
 
 
+
+
+app.get("/jobs/:city", async (req, res) => {
+
+    try {
+
+
+        const skilljob = await jobs.find({ $and: [{ "city": { $eq: req.params.city } }, { "skills": "Node.js" }] }).lean().exec();
+        res.status(500).send({ skilljob })
+    }
+    catch (e) {
+        res.status(500).send({ e })
+    }
+
+})
+
+
+
+
 app.get("/jobs", async (req, res) => {
 
-    const skilljob = await jobs.find({ $or: [{ "city": { $eq: "poland" } }, { "skills": { $eq: "Node.js" } }] }).lean().exec();
-    res.send({ skilljob })
+    try {
+
+
+        const workfromhomejob = await jobs.find({ "workfromhome": true }).lean().exec();
+        res.status(500).send({ workfromhomejob })
+    }
+    catch (e) {
+        res.status(500).send({ e })
+    }
 
 
 })
+
+
+// jobs which having 2 month notice periods
+
+app.get("/jobs", async (req, res) => {
+
+    try {
+
+
+        const noticeperiodjob = await jobs.find({ "noticeperiod": { $eq: 2 } }).lean().exec();
+        res.send({ noticeperiodjob })
+    }
+    catch (e) {
+        res.status(500).send({ e })
+    }
+
+
+
+})
+
+
+
+
+
+app.get("/jobs", async (req, res) => {
+    try {
+        const highratingjob = await jobs.find().sort({ "rating": -1 }).lean().exec();
+        res.send({ highratingjob })
+    }
+    catch (e) {
+        res.status(500).send({ e })
+    }
+
+
+})
+
+
+
+
 
 
 const companyschema = new mongoose.Schema({
@@ -51,6 +121,7 @@ const companyschema = new mongoose.Schema({
     openjobs: { type: Number, required: true },
 
 
+
 }, {
     versionKey: false,
     timestamp: true
@@ -60,30 +131,56 @@ const company = mongoose.model("company", companyschema);
 
 
 
-app.get("/company", async (req, res) => {
-    const allcompany = await company.find().lean().exec();
-    res.send({ allcompany })
-})
+app.get("/companies", async (req, res) => {
+    try {
 
 
-app.get("/company/:id", async (req, res) => {
-
-    const companydetail = await company.find({ "_id": { $eq: req.params.id } }).lean().exec();
-
-    res.send({ companydetail })
-
+        const allcompany = await company.find().lean().exec();
+        res.send({ allcompany })
+    }
+    catch (e) {
+        res.status(500).send({ e })
+    }
 
 })
 
 
-app.get("/company", async (req, res) => {
 
-    const mostopenjobcompany = await company.find({ "openjobs": { $gte: req.params.no } }).sort().lean().exec();
+app.get("/companies/:id", async (req, res) => {
 
-    res.send({ mostopenjobcompany })
+    try {
+
+
+        const companydetail = await company.find({ "_id": { $eq: req.params.id } }).lean().exec();
+
+        res.send({ companydetail })
+    }
+
+    catch (e) {
+        res.status(500).send({ e })
+    }
 
 
 })
+
+
+
+
+
+app.get("/companies", async (req, res) => {
+
+    try {
+        const mostopenjobcompany = await company.find().sort({ "openjobs": -1 }).limit(10).lean().exec();
+
+        res.send({ mostopenjobcompany })
+    }
+    catch (e) {
+        res.status(500).send({ e })
+    }
+
+
+})
+
 
 
 
