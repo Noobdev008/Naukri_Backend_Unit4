@@ -3,15 +3,11 @@ const app = express();
 
 const mongoose = require('mongoose');
 
-
-
-
 const connect = async () => {
-    mongoose.connect("mongodb://127.0.0.1:27017/emploaye-api")
+    mongoose.connect("mongodb://localhost:27017/employee-api")
 }
 
 app.use(express.json());
-
 
 
 const jobschema = new mongoose.Schema({
@@ -38,7 +34,6 @@ const jobs = mongoose.model("job", jobschema);
 
 
 
-
 app.get("/jobs/:city", async (req, res) => {
 
     try {
@@ -52,9 +47,6 @@ app.get("/jobs/:city", async (req, res) => {
     }
 
 })
-
-
-
 
 app.get("/jobs", async (req, res) => {
 
@@ -72,8 +64,6 @@ app.get("/jobs", async (req, res) => {
 })
 
 
-// jobs which having 2 month notice periods
-
 app.get("/jobs", async (req, res) => {
 
     try {
@@ -90,10 +80,6 @@ app.get("/jobs", async (req, res) => {
 
 })
 
-
-
-
-
 app.get("/jobs", async (req, res) => {
     try {
         const highratingjob = await jobs.find().sort({ "rating": -1 }).lean().exec();
@@ -105,10 +91,6 @@ app.get("/jobs", async (req, res) => {
 
 
 })
-
-
-
-
 
 
 const companyschema = new mongoose.Schema({
@@ -131,7 +113,7 @@ const company = mongoose.model("company", companyschema);
 
 
 
-app.get("/companies", async (req, res) => {
+app.get("/company", async (req, res) => {
     try {
 
 
@@ -146,7 +128,7 @@ app.get("/companies", async (req, res) => {
 
 
 
-app.get("/companies/:id", async (req, res) => {
+app.get("/company/:id", async (req, res) => {
 
     try {
 
@@ -163,11 +145,7 @@ app.get("/companies/:id", async (req, res) => {
 
 })
 
-
-
-
-
-app.get("/companies", async (req, res) => {
+app.get("/company", async (req, res) => {
 
     try {
         const mostopenjobcompany = await company.find().sort({ "openjobs": -1 }).limit(10).lean().exec();
@@ -181,12 +159,3 @@ app.get("/companies", async (req, res) => {
 
 })
 
-
-
-
-console.log("hello")
-
-app.listen(2900, async () => {
-    await connect()
-    console.log("listening on the port 2900")
-})
